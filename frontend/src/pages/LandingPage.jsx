@@ -136,7 +136,9 @@ export default function LandingPage() {
                             </p>
                             <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
                                 <Twitter size={20} className="text-muted" style={{ cursor: 'pointer' }} />
-                                <Github size={20} className="text-muted" style={{ cursor: 'pointer' }} />
+                                <a href="https://github.com/Netwalls/recurr.git" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
+                                    <Github size={20} className="text-muted" style={{ cursor: 'pointer' }} />
+                                </a>
                                 <Disc size={20} className="text-muted" style={{ cursor: 'pointer' }} />
                             </div>
                         </div>
