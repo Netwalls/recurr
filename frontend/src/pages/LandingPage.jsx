@@ -127,9 +127,9 @@ export default function LandingPage() {
                 <div className="container">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '2rem' }}>
                         <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                                <div style={{ width: '20px', height: '20px', background: 'linear-gradient(135deg, #2DD4BF, #2D88D4)', borderRadius: '4px' }}></div>
-                                <span style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Recurr</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1rem' }}>
+                                <img src="/logo.png" alt="recurr logo" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
+                                <span style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>recurr</span>
                             </div>
                             <p className="text-muted" style={{ fontSize: '0.9rem', maxWidth: '300px' }}>
                                 The standard for on-chain revenue verification and financing.
@@ -160,7 +160,7 @@ export default function LandingPage() {
                         </div>
                     </div>
                     <div style={{ borderTop: '1px solid #222', marginTop: '3rem', paddingTop: '2rem', textAlign: 'center', fontSize: '0.85rem', color: '#444' }}>
-                        © 2026 Recurr Protocol. Built on Mantle Network.
+                        © 2026 recurr Protocol. Built on Mantle Network.
                     </div>
                 </div>
             </footer>

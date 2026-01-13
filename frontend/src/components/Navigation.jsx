@@ -18,15 +18,12 @@ export default function Navigation({ account, connect }) {
                     letterSpacing: '-0.04em',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
-                    textDecoration: 'none'
+                    gap: '0.8rem',
+                    textDecoration: 'none',
+                    fontWeight: '700'
                 }}>
-                    <div style={{
-                        width: '24px', height: '24px',
-                        background: 'linear-gradient(135deg, #2DD4BF, #2D88D4)',
-                        borderRadius: '6px'
-                    }}></div>
-                    Recurr
+                    <img src="/logo.png" alt="recurr logo" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
+                    recurr
                 </Link>
 
                 {/* Desktop Links - Centered */}
