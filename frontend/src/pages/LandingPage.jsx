@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, FileSpreadsheet, Cpu, CheckCircle, TrendingUp, ShieldCheck, Wallet, Github, Twitter, Disc } from 'lucide-react';
+import { ArrowRight, FileSpreadsheet, Cpu, CheckCircle, TrendingUp, ShieldCheck, Wallet, Github, Youtube, Disc } from 'lucide-react';
 
 export default function LandingPage() {
     return (
@@ -135,7 +135,7 @@ export default function LandingPage() {
                                 The standard for on-chain revenue verification and financing.
                             </p>
                             <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-                                <Twitter size={20} className="text-muted" style={{ cursor: 'pointer' }} />
+                                <Youtube size={20} className="text-muted" style={{ cursor: 'pointer' }} />
                                 <a href="https://github.com/Netwalls/recurr.git" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
                                     <Github size={20} className="text-muted" style={{ cursor: 'pointer' }} />
                                 </a>
