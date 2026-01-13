@@ -9,6 +9,8 @@ To pitch **recurr** effectively, you need to bridge the gap between **Real-World
 
 **recurr** solves this by turning **Revenue into Collateral**. We use an on-chain extraction engine to verify bank statements and anchor credit scores onto the Mantle Network. This allows businesses to mint 'Revenue Bonds' and access non-dilutive capital from global investors instantly. We aren't just a lending platform; we are the trust-layer for the next generation of digital-native credit."
 
+**Live Demo**: [https://recurr-tau.vercel.app/](https://recurr-tau.vercel.app/)
+
 ---
 
 ## 2. The Problem-Solution Hook
