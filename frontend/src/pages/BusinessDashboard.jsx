@@ -177,7 +177,10 @@ export default function BusinessDashboard({ account, provider, chainId }) {
             addLog(`Initiating File Scan: ${file.name}`);
             let text = "";
 
-            if (file.type === "application/pdf") {
+            // Check if it's a PDF by mime type OR file extension
+            const isPDF = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+
+            if (isPDF) {
                 addLog("> File Type: PDF detected. Loading PDF.js...");
                 const pdfLib = await loadPDFLib();
                 const arrayBuffer = await file.arrayBuffer();
@@ -190,13 +193,17 @@ export default function BusinessDashboard({ account, provider, chainId }) {
                     text += content.items.map(item => item.str).join(' ') + '\n';
                 }
             } else {
-                addLog("> File Type: CSV/Text detected.");
+                addLog("> File Type: CSV detected.");
                 text = await file.text();
             }
 
             setExtractedText(text);
             const lines = text.split('\n').filter(l => l.trim());
-            addLog(`> Analyzing ${lines.length} lines...`);
+            addLog(`> Status: Extracted ${lines.length} lines of text.`);
+
+            if (text.length > 0) {
+                addLog(`> Debug: First 50 chars: "${text.substring(0, 50).replace(/\n/g, ' ')}..."`);
+            }
 
             // Parse the file content
             const results = parseFileContent(lines);
@@ -271,9 +278,10 @@ export default function BusinessDashboard({ account, provider, chainId }) {
 
         if (isCSV) {
             const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-            const creditIdx = headers.findIndex(h => h.includes('credit'));
-            const debitIdx = headers.findIndex(h => h.includes('debit'));
-            const balanceIdx = headers.findIndex(h => h.includes('balance'));
+            // Broader CSV keyword matching
+            const creditIdx = headers.findIndex(h => h.includes('credit') || h.includes('deposit') || h.includes('inward') || h.includes('inout'));
+            const debitIdx = headers.findIndex(h => h.includes('debit') || h.includes('withdraw') || h.includes('outward') || h.includes('expense'));
+            const balanceIdx = headers.findIndex(h => h.includes('balance') || h.includes('bal'));
 
             let totalCredits = 0, totalDebits = 0, lastBalance = 0, txCount = 0;
 
@@ -281,20 +289,20 @@ export default function BusinessDashboard({ account, provider, chainId }) {
                 const cols = lines[i].split(',').map(c => c.trim());
 
                 if (creditIdx >= 0 && cols[creditIdx]) {
-                    const val = parseFloat(cols[creditIdx].replace(/[,$]/g, ''));
+                    const val = parseFloat(cols[creditIdx].replace(/[,$₦#\s]/g, ''));
                     if (!isNaN(val) && val > 0) { totalCredits += val; txCount++; }
                 }
                 if (debitIdx >= 0 && cols[debitIdx]) {
-                    const val = parseFloat(cols[debitIdx].replace(/[,$]/g, ''));
+                    const val = parseFloat(cols[debitIdx].replace(/[,$₦#\s]/g, ''));
                     if (!isNaN(val) && val > 0) { totalDebits += val; txCount++; }
                 }
                 if (balanceIdx >= 0 && cols[balanceIdx]) {
-                    const val = parseFloat(cols[balanceIdx].replace(/[,$]/g, ''));
+                    const val = parseFloat(cols[balanceIdx].replace(/[,$₦#\s]/g, ''));
                     if (!isNaN(val)) lastBalance = val;
                 }
             }
 
-            addLog(`Parsed CSV: Credits=$${totalCredits.toLocaleString()}, Debits=$${totalDebits.toLocaleString()}, Balance=$${lastBalance.toLocaleString()}`);
+            addLog(`Parsed CSV: Inflow=$${totalCredits.toLocaleString()}, Outflow=$${totalDebits.toLocaleString()}, Balance=$${lastBalance.toLocaleString()}`);
 
             return {
                 totalDeposits: totalCredits,
@@ -307,7 +315,13 @@ export default function BusinessDashboard({ account, provider, chainId }) {
 
         // PDF/Text fallback parsing using regex and keywords
         let totalDeposits = 0, totalWithdrawals = 0, lastBalance = 0, txCount = 0;
-        const amountRegex = /-?\d{1,3}(?:,\d{3})*(?:\.\d+)?|-?\d+(?:\.\d+)?/g;
+        // More robust amount regex: handles $ , . and spaces
+        const amountRegex = /(?:[₦$]?)\s?-?\d{1,3}(?:,\d{3})*(?:\.\d+)?/g;
+
+        // Expanded keyword lists
+        const depositKeywords = ['deposit', 'credit', 'cr', 'inflow', 'received', 'incoming', 'total in', 'funding'];
+        const withdrawalKeywords = ['withdraw', 'debit', 'dr', 'outflow', 'sent', 'outgoing', 'total out', 'expense', 'payment'];
+        const balanceKeywords = ['balance', 'bal', 'closing', 'ending', 'current'];
 
         for (const line of lines) {
             const lower = line.toLowerCase();
@@ -315,21 +329,27 @@ export default function BusinessDashboard({ account, provider, chainId }) {
             if (!matches) continue;
 
             for (const raw of matches) {
-                const val = parseFloat(raw.replace(/,/g, ''));
+                const val = parseFloat(raw.replace(/[,$₦#\s]/g, ''));
                 if (isNaN(val) || Math.abs(val) === 0) continue;
 
-                if (lower.includes('deposit') || lower.includes('credit') || lower.includes('cr')) {
+                if (depositKeywords.some(k => lower.includes(k))) {
                     totalDeposits += Math.abs(val);
                     txCount++;
-                } else if (lower.includes('withdraw') || lower.includes('debit') || lower.includes('dr')) {
+                } else if (withdrawalKeywords.some(k => lower.includes(k))) {
                     totalWithdrawals += Math.abs(val);
                     txCount++;
                 }
 
-                if (lower.includes('balance')) {
+                if (balanceKeywords.some(k => lower.includes(k))) {
+                    // Update last balance found in file
                     lastBalance = Math.abs(val);
                 }
             }
+        }
+
+        // Diagnostic log if nothing found
+        if (totalDeposits === 0) {
+            addLog("Search Debug: Scanned lines but found no 'Deposit' keywords near numbers.");
         }
 
         // If balance missing, estimate from net flow
@@ -337,7 +357,7 @@ export default function BusinessDashboard({ account, provider, chainId }) {
             lastBalance = Math.max(0, totalDeposits - totalWithdrawals);
         }
 
-        addLog(`Parsed PDF/Text: Deposits=$${totalDeposits.toLocaleString()}, Withdrawals=$${totalWithdrawals.toLocaleString()}, Balance=$${lastBalance.toLocaleString()}, Tx=${txCount}`);
+        addLog(`Parsed Statement: Inflow=$${totalDeposits.toLocaleString()}, Outflow=$${totalWithdrawals.toLocaleString()}, Balance=$${lastBalance.toLocaleString()}, Tx=${txCount}`);
 
         return {
             totalDeposits,
