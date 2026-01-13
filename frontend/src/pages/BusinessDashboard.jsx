@@ -143,11 +143,14 @@ export default function BusinessDashboard({ account, provider, chainId }) {
     }, [provider, account]);
 
     const loadPDFLib = () => {
+        // Now pre-loaded in index.html for reliability
         return new Promise((resolve, reject) => {
             if (window.pdfjsLib) return resolve(window.pdfjsLib);
+            // Fallback for local dev if index.html isn't reloaded
             const script = document.createElement('script');
             script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
             script.onload = () => {
+                window.pdfjsLib = window['pdfjs-dist/build/pdf'];
                 window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
                 resolve(window.pdfjsLib);
             };
@@ -181,13 +184,16 @@ export default function BusinessDashboard({ account, provider, chainId }) {
             const isPDF = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
 
             if (isPDF) {
-                addLog("> File Type: PDF detected. Loading PDF.js...");
+                addLog("> File Type: PDF detected. Loading pdfjs-dist...");
                 const pdfLib = await loadPDFLib();
+                addLog("> Heartbeat: Creating ArrayBuffer...");
                 const arrayBuffer = await file.arrayBuffer();
+                addLog(`> Heartbeat: Loading Document (${arrayBuffer.byteLength} bytes)...`);
                 const pdf = await pdfLib.getDocument({ data: arrayBuffer }).promise;
                 addLog(`> PDF loaded. Pages: ${pdf.numPages}`);
 
                 for (let i = 1; i <= pdf.numPages; i++) {
+                    addLog(`> Heartbeat: Reading page ${i}...`);
                     const page = await pdf.getPage(i);
                     const content = await page.getTextContent();
                     text += content.items.map(item => item.str).join(' ') + '\n';
@@ -367,12 +373,16 @@ export default function BusinessDashboard({ account, provider, chainId }) {
             customerCount: 2
         };
     };
-
     const handleConnectOracle = async (mrr, customers) => {
         if (!account) {
             addLog("ERROR: Wallet not connected. Please connect to continue.");
             throw new Error("Wallet not connected");
         }
+
+        const network = await provider.getNetwork();
+        const currentChain = Number(network.chainId);
+        addLog(`> Heartbeat: On Network ${currentChain}`);
+
         try {
             const signer = await provider.getSigner();
             const oracle = new ethers.Contract(CONTRACT_ADDRESSES.RevenueOracleConnector, REVENUE_ORACLE_ABI, signer);
