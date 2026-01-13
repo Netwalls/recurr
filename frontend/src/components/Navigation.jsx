@@ -34,9 +34,6 @@ export default function Navigation({ account, connect }) {
                     <Link to="/invest" className={`nav-link ${isActive('/invest') ? 'active' : ''}`}>
                         For Investors
                     </Link>
-                    <Link to="/admin" className={`nav-link ${isActive('/admin') ? 'active' : ''}`}>
-                        Admin
-                    </Link>
                 </div>
 
                 {/* Connect Wallet */}
@@ -79,7 +76,6 @@ export default function Navigation({ account, connect }) {
                 }}>
                     <Link to="/business" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'white' }}>For Business</Link>
                     <Link to="/invest" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'white' }}>For Investors</Link>
-                    <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'white' }}>Admin</Link>
                 </div>
             )}
         </nav>
