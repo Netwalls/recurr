@@ -1,10 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Wallet, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { LayoutDashboard, Wallet } from 'lucide-react';
 
 export default function Navigation({ account, connect }) {
     const location = useLocation();
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const isActive = (path) => location.pathname === path;
 
@@ -58,26 +56,9 @@ export default function Navigation({ account, connect }) {
                             : "Connect Wallet"
                         }
                     </button>
-
-                    {/* Mobile Menu Toggle */}
-                    <button className="mobile-only" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} style={{ background: 'none', color: 'white' }}>
-                        {isMobileMenuOpen ? <X /> : <Menu />}
-                    </button>
                 </div>
             </div>
 
-            {/* Mobile Menu Overlay (Simple) */}
-            {isMobileMenuOpen && (
-                <div style={{
-                    position: 'absolute', top: '70px', left: '0', right: '0',
-                    background: '#111', padding: '2rem',
-                    borderBottom: '1px solid #333',
-                    display: 'flex', flexDirection: 'column', gap: '1.5rem'
-                }}>
-                    <Link to="/business" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'white' }}>For Business</Link>
-                    <Link to="/invest" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'white' }}>For Investors</Link>
-                </div>
-            )}
         </nav>
     );
 }
