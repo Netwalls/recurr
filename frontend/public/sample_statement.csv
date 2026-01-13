@@ -1,0 +1,12 @@
+Date,Description,Amount,Type
+2024-01-01,Stripe Payout,5400.00,Credit
+2024-01-02,AWS Service,120.00,Debit
+2024-01-05,Stripe Payout,4300.50,Credit
+2024-01-10,Gusto Payroll,8500.00,Debit
+2024-01-12,Stripe Payout,6100.00,Credit
+2024-01-15,Slack Subscription,45.00,Debit
+2024-01-18,Stripe Payout,5200.00,Credit
+2024-01-20,Office Rent,2500.00,Debit
+2024-01-25,Stripe Payout,5900.00,Credit
+2024-01-28,Zoom Video,15.99,Debit
+2024-01-30,Stripe Payout,4800.00,Credit
